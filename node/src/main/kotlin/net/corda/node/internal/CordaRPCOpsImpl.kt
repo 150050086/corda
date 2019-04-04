@@ -37,6 +37,12 @@ import java.io.InputStream
 import java.security.PublicKey
 import java.time.Instant
 
+/* Added by Nihhaar */
+import java.lang.System
+import java.io.File
+import java.nio.file.Paths
+/* End */
+
 /**
  * Server side implementations of RPCs available to MQ based client tools. Execution takes place on the server
  * thread (i.e. serially). Arguments are serialised and deserialised automatically.
@@ -152,6 +158,22 @@ internal class CordaRPCOpsImpl(
 
     override fun <T> startTrackedFlowDynamic(logicType: Class<out FlowLogic<T>>, vararg args: Any?): FlowProgressHandle<T> {
         val stateMachine = startFlow(logicType, args)
+        return FlowProgressHandleImpl(
+                id = stateMachine.id,
+                returnValue = stateMachine.resultFuture,
+                progress = stateMachine.logic.track()?.updates?.filter { !it.startsWith(STRUCTURAL_STEP_PREFIX) } ?: Observable.empty(),
+                stepsTreeIndexFeed = stateMachine.logic.trackStepsTreeIndex(),
+                stepsTreeFeed = stateMachine.logic.trackStepsTree()
+        )
+    }
+
+    override fun <T> startTrackedFlowDynamicDebug(logicType: Class<out FlowLogic<T>>, vararg args: Any?): FlowProgressHandle<T> {
+        val start = System.currentTimeMillis()
+        val rpcid = args.get(0)
+        val home_dir = System.getProperty("user.home")
+        File(Paths.get(home_dir, "PartyA_rpc.log").toString()).appendText("RPC_REQUEST_START $rpcid $start\n")
+
+        val stateMachine = startFlow(logicType, args.takeLast(args.size-1).toTypedArray())
         return FlowProgressHandleImpl(
                 id = stateMachine.id,
                 returnValue = stateMachine.resultFuture,

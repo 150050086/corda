@@ -73,6 +73,10 @@ class RpcAuthorisationProxy(private val implementation: CordaRPCOps, private val
         implementation.startTrackedFlowDynamic(logicType, *args)
     }
 
+    override fun <T> startTrackedFlowDynamicDebug(logicType: Class<out FlowLogic<T>>, vararg args: Any?) = guard("startTrackedFlowDynamicDebug", listOf(logicType)) {
+        implementation.startTrackedFlowDynamicDebug(logicType, *args)
+    }
+
     override fun nodeInfo(): NodeInfo = guard("nodeInfo", implementation::nodeInfo)
 
     override fun notaryIdentities(): List<Party> = guard("notaryIdentities", implementation::notaryIdentities)

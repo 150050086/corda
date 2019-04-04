@@ -24,6 +24,12 @@ import org.apache.activemq.artemis.api.core.client.ActiveMQClient
 import java.lang.reflect.Proxy
 import java.time.Duration
 
+/* Added by Nihhaar */
+import java.lang.System
+import java.io.File
+import java.nio.file.Paths
+/* End */
+
 /**
  * This configuration may be used to tweak the internals of the RPC client.
  */
@@ -122,6 +128,11 @@ class RPCClient<I : RPCOps>(
             try {
                 proxyHandler.start()
                 val ops: I = uncheckedCast(Proxy.newProxyInstance(rpcOpsClass.classLoader, arrayOf(rpcOpsClass), proxyHandler))
+                /* Added by Nihhaar */
+                val classname = ops.javaClass.name
+                val home_dir = System.getProperty("user.home")
+                File(Paths.get(home_dir, "PartyA_rpc.log").toString()).appendText("RPC_START $classname\n")
+                /* End */
                 val serverProtocolVersion = ops.protocolVersion
                 if (serverProtocolVersion < rpcConfiguration.minimumServerProtocolVersion) {
                     throw RPCException("Requested minimum protocol version (${rpcConfiguration.minimumServerProtocolVersion}) is higher" +

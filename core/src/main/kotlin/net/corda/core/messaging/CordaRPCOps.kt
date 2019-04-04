@@ -262,6 +262,13 @@ interface CordaRPCOps : RPCOps {
     @RPCReturnsObservables
     fun <T> startTrackedFlowDynamic(logicType: Class<out FlowLogic<T>>, vararg args: Any?): FlowProgressHandle<T>
 
+    /**
+     * Start the given flow with the given arguments, returning an [Observable] with a single observation of the
+     * result of running the flow. [logicType] must be annotated with [net.corda.core.flows.StartableByRPC].
+     */
+    @RPCReturnsObservables
+    fun <T> startTrackedFlowDynamicDebug(logicType: Class<out FlowLogic<T>>, vararg args: Any?): FlowProgressHandle<T>
+
     /** Returns Node's NodeInfo, assuming this will not change while the node is running. */
     fun nodeInfo(): NodeInfo
 
