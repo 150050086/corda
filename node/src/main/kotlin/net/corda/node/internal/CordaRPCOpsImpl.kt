@@ -37,6 +37,12 @@ import java.io.InputStream
 import java.security.PublicKey
 import java.time.Instant
 
+/* Added by Nihhaar */
+import java.lang.System
+import java.io.File
+import java.nio.file.Paths
+/* End */
+
 /**
  * Server side implementations of RPCs available to MQ based client tools. Execution takes place on the server
  * thread (i.e. serially). Arguments are serialised and deserialised automatically.
@@ -162,7 +168,15 @@ internal class CordaRPCOpsImpl(
     }
 
     override fun <T> startFlowDynamic(logicType: Class<out FlowLogic<T>>, vararg args: Any?): FlowHandle<T> {
+        val start = System.currentTimeMillis() // Added by Nihhaar
         val stateMachine = startFlow(logicType, args)
+
+        /* Added by Nihhaar */
+        val runId = stateMachine.id
+        val home_dir = System.getProperty("user.home")
+        File(Paths.get(home_dir, "Initiator.log").toString()).appendText("RPC_REQUEST_START $runId $start\n")
+        /* End */
+        
         return FlowHandleImpl(id = stateMachine.id, returnValue = stateMachine.resultFuture)
     }
 
